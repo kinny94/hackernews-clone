@@ -19,7 +19,7 @@ export class GraphQLModule {
   constructor(apollo: Apollo, httpLink: HttpLink) {
 
     // 4
-    const uri = '__SIMPLE_API_ENDPOINT__';
+    const uri = 'https://api.graph.cool/simple/v1/cjqzofhkx19a10148s5lxznig';
     const http = httpLink.create({ uri });
 
     // 5
