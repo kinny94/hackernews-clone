@@ -5,5 +5,15 @@ type Link @model {
   description: String!
   url: String!
   postedBy: User @relation(name: "UsersLinks")
-  votes: [Vote!]! @relation(name: "VotesOnLink")
 }
+
+type User @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  email: String @isUnique
+  password: String
+  links: [Link!]! @relation(name: "UsersLinks")
+}
+gr

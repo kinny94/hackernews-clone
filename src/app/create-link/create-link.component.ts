@@ -1,5 +1,5 @@
 import {Apollo} from 'apollo-angular';
-import {CREATE_LINK_MUTATION, CreateLinkMutationResponse} from '../graphql';
+import {CREATE_LINK_MUTATION, CreateLinkMutationResponse, ALL_LINKS_QUERY } from '../graphql';
 import {Component, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';

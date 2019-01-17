@@ -1,5 +1,14 @@
+import { Apollo } from 'apollo-angular';
+import { Router } from '@angular/router';
 import { AuthService } from './../auth.service';
 import {Component, OnInit} from '@angular/core';
+
+import {
+  CREATE_USER_MUTATION,
+  CreateUserMutationResponse,
+  SIGNIN_USER_MUTATION,
+  SigninUserMutationResponse
+} from '../graphql';
 
 @Component({
   selector: 'app-hn-login',
@@ -13,19 +22,54 @@ export class LoginComponent implements OnInit {
   password = '';
   name = '';
 
-  constructor(private authService: AuthService) {
-  }
+  constructor(private router: Router,
+    private authService: AuthService,
+    private apollo: Apollo) {
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
-  confirm() {
-    // ... you'll implement this in a bit
-  }
+    confirm() {
+      if (this.login) {
+        this.apollo.mutate({
+          mutation: SIGNIN_USER_MUTATION,
+          variables: {
+            email: this.email,
+            password: this.password
+          }
+        }).subscribe((result) => {
+          const id = result.data.signinUser.user.id;
+          const token = result.data.signinUser.token;
+          this.saveUserData(id, token);
 
-  saveUserData(id, token) {
-    localStorage.setItem(GC_USER_ID, id);
-    localStorage.setItem(GC_AUTH_TOKEN, token);
-    this.authService.setUserId(id);
+          this.router.navigate(['/']);
+
+        }, (error) => {
+          alert(error);
+        });
+      } else {
+        this.apollo.mutate({
+          mutation: CREATE_USER_MUTATION,
+          variables: {
+            name: this.name,
+            email: this.email,
+            password: this.password
+          }
+        }).subscribe((result) => {
+          const id = result.data.signinUser.user.id;
+          const token = result.data.signinUser.token;
+          this.saveUserData(id, token);
+
+          this.router.navigate(['/']);
+
+        }, (error) => {
+          alert(error);
+        });
+      }
+    }
+
+    saveUserData(id: string, token: string) {
+      this.authService.saveUserData(id, token);
+    }
   }
-}
