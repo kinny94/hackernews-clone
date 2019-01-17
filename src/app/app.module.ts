@@ -8,6 +8,9 @@ import {LinkListComponent} from './link-list/link-list.component';
 import {LinkItemComponent} from './link-item/link-item.component';
 import {CreateLinkComponent} from './create-link/create-link.component';
 import {FormsModule} from '@angular/forms';
+import { HeaderComponent } from './header/header.component';
+import {AppRoutingModule} from './app.routing';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -15,11 +18,14 @@ import {FormsModule} from '@angular/forms';
     LinkListComponent,
     LinkItemComponent,
     CreateLinkComponent,
+    HeaderComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    GraphQLModule
+    GraphQLModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
