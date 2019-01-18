@@ -1,3 +1,4 @@
+import { SearchComponent } from './search/search.component';
 import { LoginComponent } from './login/login.component';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
@@ -25,11 +26,18 @@ const routes: Routes = [
     component: LoginComponent,
     pathMatch: 'full'
   },
+  // 2
+  {
+    path: 'search',
+    component: SearchComponent,
+    pathMatch: 'full'
+  },
   {
     path: '**',
     redirectTo: '',
   }
 ];
+
 
 @NgModule({
   imports: [
