@@ -6,6 +6,7 @@ type Link @model {
   url: String!
   postedBy: User @relation(name: "UsersLinks")
   votes: [Vote!]! @relation(name: "VotesOnLink")
+
 }
 
 type User @model {
