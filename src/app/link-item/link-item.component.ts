@@ -1,7 +1,16 @@
 import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {Link} from '../types';
-import { Subscription } from 'apollo-angular';
+import { Subscription, Apollo } from 'apollo-angular';
 import {timeDifferenceForDate} from '../utils';
+import { subscribeOn } from 'rxjs/operators';
+import { CREATE_VOTE_MUTATION, ALL_LINKS_QUERY } from './../graphql';
+import { GC_USER_ID } from './../constants';
+import { DataProxy } from 'apollo-cache';
+import { FetchResult } from 'apollo-link';
+
+interface UpdateStoreAfterVoteCallback {
+  (proxy: DataProxy, mutationResult: FetchResult, linkId: string);
+}
 
 @Component({
   selector: 'app-hn-link-item',
@@ -18,16 +27,36 @@ export class LinkItemComponent implements OnInit, OnDestroy {
   @Input()
   isAuthenticated = false;
 
+  @Input()
+  updateStoreAfterVote: UpdateStoreAfterVoteCallback;
+
   subscriptions: Subscription[] = [];
 
-  constructor() {
+  constructor(private apollo: Apollo) {
   }
 
   ngOnInit() {
   }
 
-  voteForLink = async () => {
-    // ... you'll implement this in chapter 6
+  voteForLink() {
+    const userId = localStorage.getItem(GC_USER_ID);
+    const voterIds = this.link.votes.map(vote => vote.user.id);
+    if (voterIds.includes(userId)) {
+      alert(`User (${userId}) already voted for this link.`);
+      return;
+    }
+    const linkId = this.link.id;
+
+    const mutationSubscription = this.apollo.mutate({
+      mutation: CREATE_VOTE_MUTATION,
+      variables: {
+        userId,
+        linkId
+      }
+    })
+      .subscribe();
+
+    this.subscriptions = [...this.subscriptions, mutationSubscription];
   }
 
   humanizeDate(date: string) {
@@ -36,8 +65,10 @@ export class LinkItemComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     for (const sub of this.subscriptions) {
-      if (sub && sub.unsubscribe) {
-        sub.unsubscribe();
+      if (sub !== undefined ) {
+        if (sub && sub.unsubscribe) {
+          sub.unsubscribe();
+        }
       }
     }
   }

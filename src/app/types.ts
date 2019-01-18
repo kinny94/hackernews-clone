@@ -1,8 +1,10 @@
 export class Link {
-  id: string;
-  description: string;
-  url: string;
-  createdAt: string;
+  id?: string;
+  description?: string;
+  url?: string;
+  createdAt?: string;
+  postedBy?: User;
+  votes?: Vote[];
 }
 
 export class User {
