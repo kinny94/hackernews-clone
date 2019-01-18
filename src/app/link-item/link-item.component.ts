@@ -1,15 +1,15 @@
-import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Link} from '../types';
-import { Subscription, Apollo } from 'apollo-angular';
 import {timeDifferenceForDate} from '../utils';
-import { subscribeOn } from 'rxjs/operators';
-import { CREATE_VOTE_MUTATION, ALL_LINKS_QUERY } from './../graphql';
-import { GC_USER_ID } from './../constants';
-import { DataProxy } from 'apollo-cache';
-import { FetchResult } from 'apollo-link';
+import {CREATE_VOTE_MUTATION, CreateVoteMutationResponse} from '../graphql';
+import {GC_USER_ID} from '../constants';
+import {Apollo} from 'apollo-angular';
+import {Subscription} from 'rxjs';
+import {FetchResult} from 'apollo-link';
+import {DataProxy} from 'apollo-cache/lib';
 
 interface UpdateStoreAfterVoteCallback {
-  (proxy: DataProxy, mutationResult: FetchResult, linkId: string);
+  (proxy: DataProxy, mutationResult: FetchResult<CreateVoteMutationResponse>, linkId: string);
 }
 
 @Component({
@@ -25,10 +25,13 @@ export class LinkItemComponent implements OnInit, OnDestroy {
   index = 0;
 
   @Input()
-  isAuthenticated = false;
+  updateStoreAfterVote: UpdateStoreAfterVoteCallback;
 
   @Input()
-  updateStoreAfterVote: UpdateStoreAfterVoteCallback;
+  pageNumber = 0;
+
+  @Input()
+  isAuthenticated = false;
 
   subscriptions: Subscription[] = [];
 
@@ -52,6 +55,9 @@ export class LinkItemComponent implements OnInit, OnDestroy {
       variables: {
         userId,
         linkId
+      },
+      update: (store, { data: { createVote } }) => {
+        this.updateStoreAfterVote(store, createVote, linkId);
       }
     })
       .subscribe();
@@ -59,16 +65,16 @@ export class LinkItemComponent implements OnInit, OnDestroy {
     this.subscriptions = [...this.subscriptions, mutationSubscription];
   }
 
+
   humanizeDate(date: string) {
     return timeDifferenceForDate(date);
   }
 
+
   ngOnDestroy(): void {
     for (const sub of this.subscriptions) {
-      if (sub !== undefined ) {
-        if (sub && sub.unsubscribe) {
-          sub.unsubscribe();
-        }
+      if (sub && sub.unsubscribe) {
+        sub.unsubscribe();
       }
     }
   }
